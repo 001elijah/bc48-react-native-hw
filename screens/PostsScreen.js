@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useRoute } from '@react-navigation/native';
-import { Dimensions, StyleSheet, Image, Text, ScrollView, View, TouchableOpacity, FlatList } from 'react-native';
+import { Dimensions, StyleSheet, Image, Text, View, TouchableOpacity, FlatList } from 'react-native';
 
 
 import placeholderAvatarSource from '../assets/images/avatar-placeholder.png';

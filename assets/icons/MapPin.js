@@ -1,6 +1,6 @@
 import * as React from "react"
 import Svg, { Path } from "react-native-svg"
-export default SvgComponent = (props) => (
+export default MapPin = (props) => (
   <Svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"

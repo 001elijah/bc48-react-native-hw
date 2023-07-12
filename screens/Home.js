@@ -27,9 +27,10 @@ export default Home = () => {
         }}
     >
       <Tabs.Screen
-        name="Публікації"
+        name="PostsScreen"
         component={PostsScreen}
         options={{
+            title: 'Публікації',
             tabBarLabel: 'PostsScreen',
             tabBarShowLabel: false,
             tabBarIcon: ({ color }) => (
@@ -42,8 +43,10 @@ export default Home = () => {
         name="CreatePostsScreen"
         component={CreatePostsScreen}
         options={{
+            title: 'Створити публікацію',
             tabBarLabel: 'CreatePostsScreen',
             tabBarShowLabel: false,
+            tabBarStyle: { display: "none" },
             tabBarIcon: ({ color, size }) => (
                 <View
                     style={styles.buttonStyle}
