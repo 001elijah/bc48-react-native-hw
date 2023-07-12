@@ -1,12 +1,50 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useRoute } from '@react-navigation/native';
-import { StyleSheet, Image, Text, View, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, Image, Text, ScrollView, View, TouchableOpacity, FlatList } from 'react-native';
 
 
 import placeholderAvatarSource from '../assets/images/avatar-placeholder.png';
+import testImage1 from '../assets/images/11.png';
+import testImage2 from '../assets/images/12.png';
+import testImage3 from '../assets/images/13.png';
 import LogOutButton from '../assets/icons/LogOutButton';
+import PostCard from '../components/PostCard';
 
-
+const testPosts = [
+    {   
+        id: 1,
+        imageFile: testImage1,
+        caption: 'Ліс',
+        comments: [
+            {
+                id: 1,
+                authorAvatar: placeholderAvatarSource,
+                comment: 'comment'
+            },
+            {
+                id: 1,
+                authorAvatar: placeholderAvatarSource,
+                comment: 'comment'
+            }
+        ]
+    },
+    {
+        id: 2,
+        imageFile: testImage2,
+        caption: 'Захід на Чорному морі',
+        comments: []
+    },
+    {
+        id: 3,
+        imageFile: testImage3,
+        caption: 'Старий будиночок у Венеції',
+        comments: [{
+            id: 1,
+            authorAvatar: placeholderAvatarSource,
+            comment: 'comment'
+        }]
+    },
+]
 
 function Profile({ avatar, userName, email }) {
     return (
@@ -48,21 +86,54 @@ export default function PostsScreen({ navigation }) {
     })
     return (
         <>
-            <View style={styles.container}>
+            <View style={styles.profileSection}>
                 <Profile avatar={currentUserAvatar} userName={currentUserName} email={currentUserEmail} handleLogOut={handleLogOut}/>
             </View>
-            
+            <View style={styles.postsSection}>
+                <FlatList
+                    data={testPosts}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item, index }) => {
+                        if (index !== testPosts.length - 1) {
+                            return <PostCard
+                                imageFile={item.imageFile} 
+                                caption={item.caption} 
+                                comments={item.comments}
+                            />
+                        } else {
+                            return <PostCard 
+                                imageFile={item.imageFile}
+                                caption={item.caption}
+                                comments={item.comments}
+                                style={styles.lastPostItem}
+                            />
+                        }
+                    }}
+                    keyExtractor={(item) => item.id}
+                />
+            </View>
         </>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'flex-start',
-        justifyContent: 'flex-start',
+    profileSection: {
+        width: Dimensions.get('window').width,
         backgroundColor: '#fff',
         paddingHorizontal: 16,
+    },
+    postsSection: {
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height - 88 - 92 - 83,
+        paddingTop: 32,
+        paddingHorizontal: 16,
+        backgroundColor: '#fff',
+    },
+    lastPostItem: {
+        flex: 1,
+        gap: 8,
+        paddingBottom: 43,
     },
     userDataWrapper: {
         flexDirection: 'row',

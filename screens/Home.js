@@ -1,4 +1,3 @@
-import { createStackNavigator } from '@react-navigation/stack';
 import PostsScreen from './PostsScreen';
 import CreatePostsScreen from './CreatePostsScreen';
 import ProfileScreen from './ProfileScreen';
@@ -9,7 +8,6 @@ import { StyleSheet, View, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const Tabs = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
 export default Home = () => {
     const navigation = useNavigation();
