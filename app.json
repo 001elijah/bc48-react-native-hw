@@ -1,6 +1,20 @@
 {
   "expo": {
     "name": "AwesomeProject",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ]
+    ],
     "slug": "AwesomeProject",
     "version": "1.0.0",
     "orientation": "portrait",
