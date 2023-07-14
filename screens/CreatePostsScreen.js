@@ -34,7 +34,6 @@ export default function CreatePostsScreen({ navigation }) {
 
   const titleInputRef = createRef();
   const locationTitleInputRef = createRef();
-  // const cameraRef = createRef();
   
   const height = useHeaderHeight();
 

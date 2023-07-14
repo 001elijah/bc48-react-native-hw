@@ -1,5 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { useRoute } from '@react-navigation/native';
+import { useLayoutEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Image, Text, View, TouchableOpacity, FlatList } from 'react-native';
 
 
@@ -19,12 +18,14 @@ const testPosts = [
             {
                 id: 1,
                 authorAvatar: placeholderAvatarSource,
-                comment: 'comment'
+                comment: 'comment1',
+                date: '09 червня, 2020 | 08:40'
             },
             {
-                id: 1,
+                id: 2,
                 authorAvatar: placeholderAvatarSource,
-                comment: 'comment'
+                comment: 'comment2',
+                date: '09 червня, 2020 | 08:40'
             }
         ]
     },
@@ -41,7 +42,8 @@ const testPosts = [
         comments: [{
             id: 1,
             authorAvatar: placeholderAvatarSource,
-            comment: 'comment'
+            comment: 'comment1',
+            date: '09 червня, 2020 | 08:40'
         }]
     },
 ]
@@ -69,6 +71,14 @@ export default function PostsScreen({ navigation }) {
     const handleLogOut = () => {
         navigation.navigate("Auth");
     }
+
+    const handleNavigationToComments = (image, comments) => {
+        console.log(image, comments)
+        navigation.navigate("CommentsScreen", {image, comments})
+    }
+    const handleNavigationToMap = () => {
+        navigation.navigate("MapScreen")
+    }
     
     
     useLayoutEffect(() => {
@@ -95,20 +105,14 @@ export default function PostsScreen({ navigation }) {
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
                     renderItem={({ item, index }) => {
-                        if (index !== testPosts.length - 1) {
-                            return <PostCard
-                                imageFile={item.imageFile} 
-                                caption={item.caption} 
-                                comments={item.comments}
-                            />
-                        } else {
-                            return <PostCard 
-                                imageFile={item.imageFile}
-                                caption={item.caption}
-                                comments={item.comments}
-                                style={styles.lastPostItem}
-                            />
-                        }
+                        return <PostCard 
+                            navigateToMap={handleNavigationToMap}
+                            navigateToComments={handleNavigationToComments}
+                            imageFile={item.imageFile}
+                            caption={item.caption}
+                            comments={item.comments}
+                            style={index !== testPosts.length - 1 ? null : styles.lastPostItem}
+                        />
                     }}
                     keyExtractor={(item) => item.id}
                 />
@@ -116,7 +120,6 @@ export default function PostsScreen({ navigation }) {
         </>
     );
 }
-
 const styles = StyleSheet.create({
     profileSection: {
         width: Dimensions.get('window').width,
