@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import MapView, { Marker } from "react-native-maps";
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View, TouchableOpacity } from 'react-native';
+import ArrowLeft from '../assets/icons/ArrowLeft';
 
-export default function MapScreen() {
+export default function MapScreen({ navigation }) {
+  useLayoutEffect(() => {
+    const handleGoBack = () => {
+        navigation.goBack();
+    }
+        navigation.setOptions({
+            headerLeft: () => (
+                    <TouchableOpacity
+                      style={{marginLeft: 16}}
+                      activeOpacity={0.5}
+                      onPress={() => handleGoBack()}>
+                      <ArrowLeft />
+                    </TouchableOpacity>
+            ),
+        })
+  })
   return (
     <View style={styles.container}>
       <MapView
@@ -15,8 +31,8 @@ export default function MapScreen() {
         }}
         mapType="standard"
         minZoomLevel={15}
-        onMapReady={() => console.log("Map is ready")}
-        onRegionChange={() => console.log("Region change")}
+        // onMapReady={() => console.log("Map is ready")}
+        // onRegionChange={() => console.log("Region change")}
       >
         <Marker
           title="I am here"

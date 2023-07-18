@@ -4,7 +4,7 @@ import MessageCircle from '../assets/icons/MessageCircle';
 import MapPin from '../assets/icons/MapPin';
 
 
-export default function PostCard({ navigateToMap, navigateToComments, imageFile, caption, comments, style }) {
+export default function PostCard({ postId, authorAvatar, navigateToMap, navigateToComments, imageFile, caption, comments, style }) {
     return (
         <View style={style ? style : styles.postCardWrapper}>
             <Image
@@ -15,11 +15,11 @@ export default function PostCard({ navigateToMap, navigateToComments, imageFile,
             <View style={styles.postCardDataWrapper}>
                 <TouchableOpacity
                     activeOpacity={0.5}
-                    onPress={() => navigateToComments(imageFile, comments)}
+                    onPress={() => navigateToComments(postId, authorAvatar, imageFile, comments)}
                     style={styles.showCommentsButton}
                 >
-                    <MessageCircle fill={comments.length ? '#FF6C00' : 'none'} stroke={ comments.length ? '#FF6C00' : '#BDBDBD'} />
-                    <Text style={[styles.showCommentsText, comments.length === 0 && styles.noCommentsTextColor]}>{comments ? comments.length : 'none'}</Text>
+                    <MessageCircle fill={comments?.length ? '#FF6C00' : 'none'} stroke={ comments?.length ? '#FF6C00' : '#BDBDBD'} />
+                    <Text style={[styles.showCommentsText, comments?.length === 0 && styles.noCommentsTextColor]}>{comments ? comments?.length : 'none'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     activeOpacity={0.5}

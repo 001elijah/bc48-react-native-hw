@@ -21,8 +21,11 @@ import MapPin from '../assets/icons/MapPin';
 import { MaterialIcons } from '@expo/vector-icons';
 import CameraIcon from '../assets/icons/CameraIcon';
 import Trash from '../assets/icons/Trash';
+import { useDispatch } from 'react-redux';
+import { createPost } from '../redux/operations/postsOperations';
 
 export default function CreatePostsScreen({ navigation }) {
+  const dispatch = useDispatch();
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
@@ -80,6 +83,7 @@ export default function CreatePostsScreen({ navigation }) {
   }
 
   const handleSubmitButton = async () => {
+    if (!title || !locationTitle || !photo) return;
     let { status: locationStatus } = await Location.requestForegroundPermissionsAsync();
     if (locationStatus !== 'granted') {
       setErrorMsg('Permission to access location was denied');
@@ -109,8 +113,8 @@ export default function CreatePostsScreen({ navigation }) {
       photo
     };
     await MediaLibrary.createAssetAsync(photo);
-    console.log(dataToSend);
-    navigation.navigate("Home", {
+    await dispatch(createPost(dataToSend));
+    navigation.replace("Home", {
       screen: "PostsScreen"
     })
   };

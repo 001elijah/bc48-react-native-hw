@@ -4,10 +4,10 @@ import MessageCircle from '../assets/icons/MessageCircle';
 import MapPin from '../assets/icons/MapPin';
 import avatarPlaceholder from '../assets/images/avatar-placeholder.png';
 
-export default function PostCard({ profilePicture, comment, date, style }) {
+export default function Comment({ profilePicture, comment, date, style }) {
     return (
-        <View style={style ? style : styles.commentCardWrapper}>
-            <Image source={profilePicture ? profilePicture : avatarPlaceholder} style={styles.userAvatar} />
+        <View style={[styles.commentCardWrapper, style]}>
+            <Image source={profilePicture ? {uri: profilePicture} : avatarPlaceholder} style={styles.userAvatar} />
             <View style={styles.commentAndDateWrapper}>
                 <Text style={styles.commentText}>{comment}</Text>
                 <Text style={styles.dateText}>{date}</Text>

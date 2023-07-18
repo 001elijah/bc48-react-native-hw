@@ -1,4 +1,4 @@
-import React, { useState, createRef } from 'react';
+import React, { useState, useEffect, createRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
     StyleSheet,
@@ -15,16 +15,20 @@ import {
 } from 'react-native';
 
 import backgroundImage from '../assets/images/background-2x.jpg';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../redux/operations/authOperations';
+import { auth } from '../config';
+import { selectAuthorized } from '../redux/selectors/authSelectors';
 
 export default function LoginScreen() {
+    const dispatch = useDispatch();
     const navigation = useNavigation();
+    // const isAuthorized = useSelector(selectAuthorized);
     const [isUserEmailInFocus, setIsUserEmailInFocus] = useState(false);
     const [isUserPasswordInFocus, setIsUserPasswordInFocus] = useState(false);
     const [userEmail, setUserEmail] = useState('');
     const [userPassword, setUserPassword] = useState('');
     const [showPassword, setShowPassword] = useState(true);
-    const [imageFile, setImageFile] = useState(null);
-    const [userName, setUserName] = useState(null);
 
     const emailInputRef = createRef();
     const passwordInputRef = createRef();
@@ -34,13 +38,16 @@ export default function LoginScreen() {
     const toggleUserEmailFocus = () => setIsUserEmailInFocus(!isUserEmailInFocus);
     const toggleUserPasswordFocus = () => setIsUserPasswordInFocus(!isUserPasswordInFocus);
 
-    const handleLogOut = () => {
-        setImageFile(null);
-        setUserEmail(null);
-        setUserName(null);
-        setUserPassword(null);
-        navigation.navigate("Auth");
-    }
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+        if (user) {
+            navigation.replace("Home", {
+                screen: "PostsScreen"
+            })
+        }
+        })
+        return unsubscribe;
+    }, [])
 
     const handleSubmitButton = () => {
         if (!userEmail) {
@@ -55,11 +62,8 @@ export default function LoginScreen() {
             email: userEmail,
             password: userPassword,
         };
-        console.log(dataToSend);
-        navigation.navigate("Home", {
-            screen: "PostsScreen",
-            params: { avatar: { uri: imageFile }, userName: userName, email: userEmail }
-        })
+        dispatch(login(dataToSend))
+        // navigation.replace("Home", { screen: "PostsScreen" })
   };
   return (
           <ImageBackground source={backgroundImage} resizeMode="cover" style={styles.backgroundImage}>

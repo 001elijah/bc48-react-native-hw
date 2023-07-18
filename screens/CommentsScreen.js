@@ -1,4 +1,4 @@
-import { useState, createRef } from 'react';
+import { useState, createRef, useEffect, useLayoutEffect } from 'react';
 import {
   Keyboard, 
   TouchableWithoutFeedback, 
@@ -15,38 +15,71 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import { useRoute } from '@react-navigation/native';
 import Comment from '../components/Comment';
 import ArrowTop from '../assets/icons/ArrowTop';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectPosts } from '../redux/selectors/postsSelectors';
+import { createComment } from '../redux/operations/postsOperations';
+import ArrowLeft from '../assets/icons/ArrowLeft';
 
-export default function CommentsScreen() {
+export default function CommentsScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const { params: { postId, authorAvatar, image, comments } } = useRoute();
+  const commentsToThePost = useSelector(selectPosts)?.filter(post => post.id === postId)[0]?.data?.comments;
   const [comment, setComment] = useState('');
-  const { params: { image, comments } } = useRoute();
 
   const commentInputRef = createRef();
   
   const headerHeight = useHeaderHeight();
+
+  const handleCommentSubmit = async (postId, authorAvatar, comment) => {
+    if (!comment) return;
+    await dispatch(createComment({ postId, authorAvatar, comment }))
+    Keyboard.dismiss();
+    setComment('');
+  }
+
+  useLayoutEffect(() => {
+    const handleGoBack = () => {
+        navigation.goBack();
+    }
+        navigation.setOptions({
+            headerLeft: () => (
+                    <TouchableOpacity
+                      style={{marginLeft: 16}}
+                      activeOpacity={0.5}
+                      onPress={() => handleGoBack()}>
+                      <ArrowLeft />
+                    </TouchableOpacity>
+            ),
+        })
+  })
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS == "ios" ? "padding" : "height"}
-      style={styles.commentsSection}
+      style={styles.keyboardWrapper}
       keyboardVerticalOffset={headerHeight}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.inner}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <Image
               source={image}
               style={styles.postCardImage}
-          />
+              />
+          </TouchableWithoutFeedback>
           <FlatList
-            data={comments}
+            data={commentsToThePost}
+            style={{marginTop: 32}}
+            contentContainerStyle={styles.commentsWrapper}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => {
+            renderItem={({ item, index }) => {
               return <Comment
                 profilePicture={item.authorAvatar}
                 comment={item.comment}
                 date={item.date}
+                style={index === 0 && {paddingTop: 0}}
               />
             }}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item, index) => index}
           />
           <View style={styles.iconAndInputWrapper} automaticallyAdjustContentInsets={false}>
             <TextInput
@@ -55,26 +88,29 @@ export default function CommentsScreen() {
               placeholder="Коментувати…"
               placeholderTextColor="#BDBDBD"
               ref={commentInputRef}
+              value={comment}
               returnKeyType="next"
               blurOnSubmit={false}
             />
             <TouchableOpacity
               style={[styles.buttonStyle, comment && styles.readyToPuplish]}
               activeOpacity={0.5}
-              onPress={()=> alert('Something')}
+              onPress={() => handleCommentSubmit(postId, authorAvatar, comment)}
             >
               <ArrowTop />
             </TouchableOpacity>
           </View>
         </View>
-      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  commentsSection: {
+  keyboardWrapper: {
     flex: 1,
+  },
+  commentsWrapper: {
+
   },
   inner: {
     flex: 1,

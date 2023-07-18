@@ -1,57 +1,20 @@
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useEffect } from 'react';
 import { Dimensions, StyleSheet, Image, Text, View, TouchableOpacity, FlatList } from 'react-native';
 
 
 import placeholderAvatarSource from '../assets/images/avatar-placeholder.png';
-import testImage1 from '../assets/images/11.png';
-import testImage2 from '../assets/images/12.png';
-import testImage3 from '../assets/images/13.png';
 import LogOutButton from '../assets/icons/LogOutButton';
 import PostCard from '../components/PostCard';
-
-const testPosts = [
-    {   
-        id: 1,
-        imageFile: testImage1,
-        caption: 'Ліс',
-        comments: [
-            {
-                id: 1,
-                authorAvatar: placeholderAvatarSource,
-                comment: 'comment1',
-                date: '09 червня, 2020 | 08:40'
-            },
-            {
-                id: 2,
-                authorAvatar: placeholderAvatarSource,
-                comment: 'comment2',
-                date: '09 червня, 2020 | 08:40'
-            }
-        ]
-    },
-    {
-        id: 2,
-        imageFile: testImage2,
-        caption: 'Захід на Чорному морі',
-        comments: []
-    },
-    {
-        id: 3,
-        imageFile: testImage3,
-        caption: 'Старий будиночок у Венеції',
-        comments: [{
-            id: 1,
-            authorAvatar: placeholderAvatarSource,
-            comment: 'comment1',
-            date: '09 червня, 2020 | 08:40'
-        }]
-    },
-]
+import { useDispatch, useSelector } from 'react-redux';
+import { selectAuthorized, selectUser } from '../redux/selectors/authSelectors';
+import { logout } from '../redux/operations/authOperations';
+import { selectPosts } from '../redux/selectors/postsSelectors';
+import { readPosts } from '../redux/operations/postsOperations';
 
 function Profile({ avatar, userName, email }) {
     return (
         <View style={styles.userDataWrapper}>
-            <Image source={avatar ? avatar : placeholderAvatarSource} style={styles.avatar} />
+            <Image source={avatar ? {uri: avatar} : placeholderAvatarSource} style={styles.avatar} />
             <View>
                 <Text style={styles.userNameText}>{ userName }</Text>
                 <Text>{ email }</Text>
@@ -61,33 +24,37 @@ function Profile({ avatar, userName, email }) {
 }
 
 export default function PostsScreen({ navigation }) {
+    const dispatch = useDispatch();
+    const posts = useSelector(selectPosts);
+    const isLoggedIn = useSelector(selectAuthorized);
+    
+    const { avatar = placeholderAvatarSource, name = 'undefined', email = 'undefined' } = useSelector(selectUser);
 
-    const [currentUserName, setCurrentUserName] = useState('Natali Romanova');
-    const [currentUserEmail, setCurrentUserEmail] = useState('email@example.com');
-    const [currentUserAvatar, setCurrentUserAvatar] = useState(placeholderAvatarSource);
-
-    // const { params: { avatar, userName, email } } = useRoute();
-
-    const handleLogOut = () => {
-        navigation.navigate("Auth");
+    const handleLogOut = async () => {
+        await dispatch(logout());
+        navigation.replace("Auth");
     }
 
-    const handleNavigationToComments = (image, comments) => {
-        console.log(image, comments)
-        navigation.navigate("CommentsScreen", {image, comments})
+    const handleNavigationToComments = (postId, authorAvatar, image, comments) => {
+        navigation.navigate("CommentsScreen", {postId, authorAvatar, image, comments})
     }
     const handleNavigationToMap = () => {
         navigation.navigate("MapScreen")
     }
     
-    
+    useEffect(() => {
+        if (posts.length === 0) {
+            isLoggedIn && dispatch(readPosts());
+        }
+    }, [])
+
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (
                     <TouchableOpacity
                       style={styles.logoutButton}
                       activeOpacity={0.5}
-                      onPress={() => handleLogOut()}>
+                      onPress={handleLogOut}>
                       <LogOutButton />
                     </TouchableOpacity>
             ),
@@ -97,21 +64,23 @@ export default function PostsScreen({ navigation }) {
     return (
         <>
             <View style={styles.profileSection}>
-                <Profile avatar={currentUserAvatar} userName={currentUserName} email={currentUserEmail} handleLogOut={handleLogOut}/>
+                <Profile avatar={avatar} userName={name} email={email}/>
             </View>
             <View style={styles.postsSection}>
                 <FlatList
-                    data={testPosts}
+                    data={posts}
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
                     renderItem={({ item, index }) => {
                         return <PostCard 
                             navigateToMap={handleNavigationToMap}
                             navigateToComments={handleNavigationToComments}
-                            imageFile={item.imageFile}
-                            caption={item.caption}
-                            comments={item.comments}
-                            style={index !== testPosts.length - 1 ? null : styles.lastPostItem}
+                            postId={item.id}
+                            authorAvatar={avatar}
+                            imageFile={{uri: item.data?.photo}}
+                            caption={item.data?.title}
+                            comments={item.data?.comments}
+                            style={index !== posts?.length - 1 ? null : styles.lastPostItem}
                         />
                     }}
                     keyExtractor={(item) => item.id}
